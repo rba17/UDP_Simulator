@@ -7,7 +7,7 @@ public class Utilities {
 
     public static void printSendTime(char server) {
         LocalTime currentTime = LocalTime.now();
-        System.out.println("Sending packets from " + server + " at " + currentTime);
+        System.out.println("Sending packets from " + server + " at " + currentTime + "\n\n");
     }
 
     public static void printReceiveTime(char server) {
