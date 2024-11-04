@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.*;
 
 public class Client_B {
+    final static char server = 'B';
 
     public static void main(String[] args) throws IOException {
 
@@ -14,14 +15,16 @@ public class Client_B {
         for (int i = 0; i < Utilities.packetNumber; i++) {
             dpr = new DatagramPacket(buf, buf.length);
             ds.receive(dpr);
-            String message = new String(dpr.getData(), 0, dpr.getLength());
-            System.out.println(message + " " + (i + 1));
+
+            // String message = new String(dpr.getData(), 0, dpr.getLength());
+            // System.out.println(message + " " + (i + 1));
         }
-        Utilities.printReceiveTime('B');
+        Utilities.printReceiveTime(server);
+
         // B sending
         String send = "Hi from B";
-        Utilities.printSendTime('B');
-        UnreliableChannel.SendingThroughServer(dpr.getPort(), ds, ip, buf, send);
+        Utilities.printSendTime(server);
+        UnreliableChannel.SendingThroughServer(dpr.getPort(), ds, ip, buf, send, server);
 
     }
 
