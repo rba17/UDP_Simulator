@@ -6,7 +6,7 @@ public class Client_A {
 
     public static void main(String[] args) throws IOException {
 
-        // A sending
+        //A sending
         DatagramSocket ds = new DatagramSocket();
         InetAddress ip = InetAddress.getLocalHost();
         byte[] buf = new byte[1024];
