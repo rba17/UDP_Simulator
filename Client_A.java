@@ -5,15 +5,15 @@ public class Client_A {
     final static char server = 'A';
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Utilities.resetFile();
+       
         String message = "Hi from A";
         DatagramSocket ds = new DatagramSocket();
         InetAddress ip = InetAddress.getLocalHost();
         byte[] buf = new byte[1024];
 
         // A sending
-        UnreliableChannel.SendingThroughServer(Utilities.portB, ds, ip, buf, message, server);
-        Thread.sleep(100);
+        UnreliableChannel.SendingThroughServer(Utilities.port, ds, ip, buf, message, server);
+       
         // A recieving
         DatagramPacket dpr = new DatagramPacket(buf, buf.length);
 
@@ -25,6 +25,5 @@ public class Client_A {
         }
 
         Utilities.printFile(Utilities.f);
-        Thread.sleep(1000);
     }
 }

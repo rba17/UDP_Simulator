@@ -48,4 +48,48 @@ public class UnreliableChannel {
 
         Utilities.writeToFile(delayMessage);
     }
+
+    public static void main(String[] args) {
+
+        DatagramSocket ds = new DatagramSocket(Utilities.port);
+        InetAddress ip = InetAddress.getLocalHost();
+        byte[] buf = new byte[1024];
+
+
+        Random rand = new Random();
+
+       // Utilities.printSendTime(server, destination, Utilities.t0, System.nanoTime());
+
+        for (int i = 0; i < Utilities.packetNumber; i++) {
+            buf = message.getBytes();
+            DatagramPacket dps = new DatagramPacket(buf, buf.length, ip, Utilities.port);
+            double r = Math.random();
+
+            if (r < Utilities.lossFactor)
+                lost++;
+
+            else {
+                int d = rand.nextInt(0, 2001);
+                double delay = d / 10.0;
+                totalDelay += delay;
+                successfulSends++;
+            }
+            ds.send(dps);
+        }
+
+      //  Utilities.printReceiveTime(server, destination, Utilities.t0, System.nanoTime());
+
+        double averageDelay = successfulSends > 0 ? totalDelay / successfulSends : 0;
+
+        String result = "Packets received from user " + server + ": " + Utilities.packetNumber +
+                " | Lost: " + lost +
+                " | Delayed: " + (Utilities.packetNumber - lost) + "\n";
+
+        String delayMessage = "Average delay from " + server + " to " + destination + ": " + averageDelay + " ms.\n\n";
+
+        Utilities.writeToFile(result);
+
+        Utilities.writeToFile(delayMessage);
+
+    }
 }

@@ -5,9 +5,8 @@ public class Client_B {
     final static char server = 'B';
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Utilities.resetFile();
         String message = "Hi from B";
-        DatagramSocket ds = new DatagramSocket(Utilities.portB);
+        DatagramSocket ds = new DatagramSocket(Utilities.port);
         InetAddress ip = InetAddress.getLocalHost();
         byte[] buf = new byte[1024];
 
@@ -22,10 +21,8 @@ public class Client_B {
         }
 
         // B sending
-        Thread.sleep(100);
         UnreliableChannel.SendingThroughServer(dpr.getPort(), ds, ip, buf, message, server);
 
-        Thread.sleep(1000);
     }
 
 }
