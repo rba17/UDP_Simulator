@@ -1,95 +1,79 @@
 import java.io.*;
+import java.util.*;
 import java.net.*;
-import java.util.Random;
 
 public class UnreliableChannel {
-
     private static double totalDelay = 0;
     private static double successfulSends = 0;
     private static int lost = 0;
 
-    public static void SendingThroughServer(int port, DatagramSocket ds, InetAddress ip, byte[] buf, String message,
-            char server)
-            throws IOException {
-
-        Random rand = new Random();
-        char destination = (server == 'A') ? 'B' : 'A';
-
-        Utilities.printSendTime(server, destination, Utilities.t0, System.nanoTime());
-
-        for (int i = 0; i < Utilities.packetNumber; i++) {
-            buf = message.getBytes();
-            DatagramPacket dps = new DatagramPacket(buf, buf.length, ip, port);
-            double r = Math.random();
-
-            if (r < Utilities.lossFactor)
-                lost++;
-
-            else {
-                int d = rand.nextInt(0, 2001);
-                double delay = d / 10.0;
-                totalDelay += delay;
-                successfulSends++;
-            }
-            ds.send(dps);
-        }
-
-        Utilities.printReceiveTime(server, destination, Utilities.t0, System.nanoTime());
-
-        double averageDelay = successfulSends > 0 ? totalDelay / successfulSends : 0;
-
-        String result = "Packets received from user " + server + ": " + Utilities.packetNumber +
-                " | Lost: " + lost +
-                " | Delayed: " + (Utilities.packetNumber - lost) + "\n";
-
-        String delayMessage = "Average delay from " + server + " to " + destination + ": " + averageDelay + " ms.\n\n";
-
-        Utilities.writeToFile(result);
-
-        Utilities.writeToFile(delayMessage);
-    }
-
-    public static void main(String[] args) {
-
-        DatagramSocket ds = new DatagramSocket(Utilities.port);
-        InetAddress ip = InetAddress.getLocalHost();
-        byte[] buf = new byte[1024];
-
-
+    public static void main(String[] args) throws InterruptedException, IOException {
+        System.out.println("UnreliableChannel started. Listening on port " + Utilities.channelPort + "...");
         Random rand = new Random();
 
-       // Utilities.printSendTime(server, destination, Utilities.t0, System.nanoTime());
+        DatagramSocket ds = new DatagramSocket(Utilities.channelPort);
+        byte[] receiveBuffer = new byte[Utilities.BUFFER_SIZE];
+        DatagramPacket dpr = new DatagramPacket(receiveBuffer, receiveBuffer.length);
 
-        for (int i = 0; i < Utilities.packetNumber; i++) {
-            buf = message.getBytes();
-            DatagramPacket dps = new DatagramPacket(buf, buf.length, ip, Utilities.port);
-            double r = Math.random();
+        int pairs = Utilities.countPairs();
+        char server = '#', destination = '&';
 
-            if (r < Utilities.lossFactor)
-                lost++;
+        for (int i = 0; i < pairs; i++) {
 
-            else {
-                int d = rand.nextInt(0, 2001);
-                double delay = d / 10.0;
-                totalDelay += delay;
-                successfulSends++;
+            for (int j = 0; j < Utilities.packetNumber; j++) {
+
+                ds.receive(dpr);
+                InetAddress ip = dpr.getAddress();
+                int senderPort = dpr.getPort();
+
+                String receivedMessage = new String(dpr.getData(), 0, dpr.getLength());
+
+                // System.out.println("Received from " + ip + ":" + senderPort + " - " +
+                // receivedMessage);
+                server = receivedMessage.charAt(receivedMessage.length() - 2);
+                destination = receivedMessage.charAt(receivedMessage.length() - 1);
+
+                double r = rand.nextDouble();
+                if (r < Utilities.lossFactor)
+                    lost++;
+                else {
+                    int d = rand.nextInt(0, 201);
+                    double delay = d / 10.0;
+                    totalDelay += delay;
+                    successfulSends++;
+                }
+
+                String responseMessage = receivedMessage.substring(0, receivedMessage.length() - 2) + " $$ ";
+                byte[] sendBuffer = responseMessage.getBytes();
+
+                DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length, ip,
+                        senderPort);
+
+                ds.send(sendPacket);
+
+                // System.out.println("Sent response to " + ip + ":" + senderPort + " - " +
+                // responseMessage);
+
             }
-            ds.send(dps);
+            double averageDelay = successfulSends > 0 ? totalDelay / successfulSends : 0;
+            String result = "Packets received from user " + server + ": " +
+                    Utilities.packetNumber +
+                    " | Lost: " + lost +
+                    " | Delayed: " + (Utilities.packetNumber - lost) + "\n";
+
+            String delayMessage = "Average delay from " + server + " to " + destination +
+                    ": " + averageDelay + " ms.\n\n";
+
+            Utilities.writeToFile(result);
+
+            Utilities.writeToFile(delayMessage);
+
         }
+        ds.close();
 
-      //  Utilities.printReceiveTime(server, destination, Utilities.t0, System.nanoTime());
+        System.out.println("UnreliableChannel has been stopped.");
 
-        double averageDelay = successfulSends > 0 ? totalDelay / successfulSends : 0;
-
-        String result = "Packets received from user " + server + ": " + Utilities.packetNumber +
-                " | Lost: " + lost +
-                " | Delayed: " + (Utilities.packetNumber - lost) + "\n";
-
-        String delayMessage = "Average delay from " + server + " to " + destination + ": " + averageDelay + " ms.\n\n";
-
-        Utilities.writeToFile(result);
-
-        Utilities.writeToFile(delayMessage);
+        Utilities.printFile(Utilities.f);
 
     }
 }
