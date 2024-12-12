@@ -6,7 +6,10 @@ public class Utils {
     final static double lossFactor = 0.1;
     final static int packetNumber = 100;
     final static int channelPort = 9999;
+    final static int destinationPort = 5000;
     final static int BUFFER_SIZE = 1024;
+    final static int packetSize = 512;
+    final static String destinationIP_string = "192.168.0.109";
     public static File f = new File("Report.txt");
 
     public static void printSendTime(char sender, char receiver, long t0, long t1) {

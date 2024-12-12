@@ -74,6 +74,7 @@ public class Client {
 
                     } catch (SocketTimeoutException e) {
                         System.out.println("NACK(" + i + ")");
+                        //when channel doesnt send ^
                     }
                 }
 
