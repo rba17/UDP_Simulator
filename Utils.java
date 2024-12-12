@@ -1,4 +1,6 @@
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 public class Utils {
@@ -10,8 +12,12 @@ public class Utils {
     final static int destinationPort = 5000;
     final static int BUFFER_SIZE = 1024;
     final static int packetSize = 512;
-    final static String destinationIP_string = "192.168.0.109";
+    final static String destinationIP_string = "127.0.0.1";
     public static File f = new File("Report.txt");
+
+    public static InetAddress UCIP() throws UnknownHostException {
+        return InetAddress.getLocalHost();
+    }
 
     public static void printSendTime(char sender, char receiver, long t0, long t1) {
         System.out.println("\nSending packets from " + sender + " to " + receiver + " at elapsed:\t"
