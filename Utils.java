@@ -4,6 +4,7 @@ import java.util.*;
 public class Utils {
 
     final static double lossFactor = 0.1;
+    final static int maxDelay = 200;
     final static int packetNumber = 100;
     final static int channelPort = 9999;
     final static int destinationPort = 5000;

@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
-public class UChannel {
+public class UChannel_phase1 {
 
     private static class Info {
         private double totalDelay;

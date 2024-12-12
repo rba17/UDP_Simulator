@@ -14,22 +14,23 @@ public class RUDPSource {
         byte[] fileToBytes = f.readAllBytes(); // making the file into bites
         f.close();
 
-        int totalNumPackets = (fileToBytes.length + Utils.packetSize - 1) / Utils.packetSize;
+        int totalPackets = (fileToBytes.length + Utils.packetSize - 1) / Utils.packetSize;
 
         System.out.println(fileToBytes.length);
-        System.out.println(totalNumPackets);
+        System.out.println(totalPackets);
 
-        String handShakeMSG = "" + totalNumPackets;
-        byte[] handShakeBytes = handShakeMSG.getBytes();
-        DatagramPacket handShakePacket = new DatagramPacket(handShakeBytes, handShakeBytes.length, destinationIP,
+        String handShakeMSG = "" + totalPackets;
+        byte[] handShakeBytesSend = handShakeMSG.getBytes();
+        DatagramPacket handShakePacket = new DatagramPacket(handShakeBytesSend, handShakeBytesSend.length,
+                destinationIP,
                 Utils.destinationPort);
         socket.send(handShakePacket);
 
-        byte[] rbuffer = new byte[1024];
-        DatagramPacket response = new DatagramPacket(rbuffer, rbuffer.length);
-        socket.receive(response);
+        byte[] handShakeBytesRecieve = new byte[1024];
+        DatagramPacket responsePacket = new DatagramPacket(handShakeBytesRecieve, handShakeBytesRecieve.length);
+        socket.receive(responsePacket);
 
-        for (int i = 0; i < totalNumPackets; i++) {
+        for (int i = 0; i < totalPackets; i++) {
             int start = i * Utils.packetSize;
             int end = 0;
             if (start + Utils.packetSize < fileToBytes.length)
@@ -37,12 +38,12 @@ public class RUDPSource {
             else
                 end = fileToBytes.length;
             byte[] packetToSend = Arrays.copyOfRange(fileToBytes, start, end);
-            DatagramPacket dps = new DatagramPacket(packetToSend, packetToSend.length, response.getAddress(),
-                    response.getPort());
+            DatagramPacket dps = new DatagramPacket(packetToSend, packetToSend.length, responsePacket.getAddress(),
+                    responsePacket.getPort());
             socket.send(dps);
 
-            byte[] ACKBuffer = new byte[1024];
-            DatagramPacket ACKPacket = new DatagramPacket(ACKBuffer, ACKBuffer.length);
+            byte[] ACKRCV = new byte[1024];
+            DatagramPacket ACKPacket = new DatagramPacket(ACKRCV, ACKRCV.length);
             try {
                 socket.receive(ACKPacket);
             } catch (Exception error) {
